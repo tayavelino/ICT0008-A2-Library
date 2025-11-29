@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <algorithm>
 using namespace std;
 
 struct Book {
@@ -28,7 +27,7 @@ struct Book {
 
     void returnBook() { available = true; }
 
-    // Insertion Sort por ISBN (ordem crescente)
+    // Insertion Sort by ISBN (ascending)
     static void sortBookData(vector<Book>& books) {
         for (size_t i = 1; i < books.size(); ++i) {
             Book key = books[i];
@@ -49,9 +48,9 @@ int findByISBN(const vector<Book>& books, const string& isbn) {
 }
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    // keep default i/o settings to avoid buffering issues on Replit
 
+    // --- sample data (5 books) ---
     vector<Book> books(5);
     books[0].setBookDetails("Networks 101", "Alice", "9780001", true, "2025-11-20");
     books[1].setBookDetails("Graph Theory", "Bob",   "9780003", true, "2025-11-20");
@@ -59,39 +58,37 @@ int main() {
     books[3].setBookDetails("Data Flows",   "Dion",  "9780005", true, "2025-11-20");
     books[4].setBookDetails("Sorting Algo", "Eve",   "9780004", true, "2025-11-20");
 
-    // Ordenar por ISBN
+    // sort by ISBN
     Book::sortBookData(books);
 
-    cout << "==== Library System ====\n";
+    // header + initial list (shown immediately)
+    cout << "==== Library System ====" << endl;
     for (const auto& b : books) b.displayBookDetails();
-    cout << "\n";
+    cout << endl;
 
-    // >>> o loop fica DENTRO do main e ANTES do return 0;
+    // borrow loop
     while (true) {
-        cout << "Enter ISBN to borrow (0 to quit): ";
-        string in; 
+        cout << "Enter ISBN to borrow (0 to quit): " << flush; // force prompt to show
+        string in;
         if (!(cin >> in)) break;
 
         if (in == "0") {
-            cout << "Program ended. Goodbye!\n";
+            cout << "Program ended. Goodbye!" << endl;
             break;
         }
 
         int idx = findByISBN(books, in);
         if (idx < 0) {
-            cout << "Book not found: " << in << "\n";
+            cout << "Book not found: " << in << endl;
             continue;
         }
 
         if (books[idx].borrowBook()) {
-            cout << "Borrowed successfully: " << in << "\n";
+            cout << "Borrowed successfully: " << in << endl;
         } else {
-            cout << "ERROR: Book " << in << " is currently unavailable.\n";
+            cout << "ERROR: Book " << in << " is currently unavailable." << endl;
         }
     }
 
     return 0;
-    // A2 evidence
-    
-    
-} 
+}
