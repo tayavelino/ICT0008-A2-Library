@@ -61,32 +61,69 @@ int main() {
     // sort by ISBN
     Book::sortBookData(books);
 
-    // header + initial list (shown immediately)
+    // header + initial list
     cout << "==== Library System ====" << endl;
     for (const auto& b : books) b.displayBookDetails();
     cout << endl;
 
-    // borrow loop
+    // command loop
     while (true) {
-        cout << "Enter ISBN to borrow (0 to quit): " << flush; // force prompt to show
-        string in;
-        if (!(cin >> in)) break;
+        cout << "Command [B isbn / R isbn / L / 0]: " << flush;
 
-        if (in == "0") {
+        string cmd;
+        if (!(cin >> cmd)) break;
+
+        if (cmd == "0") {
             cout << "Program ended. Goodbye!" << endl;
             break;
         }
 
-        int idx = findByISBN(books, in);
-        if (idx < 0) {
-            cout << "Book not found: " << in << endl;
+        if (cmd == "L" || cmd == "l") {
+            for (const auto& b : books) b.displayBookDetails();
+            cout << endl;
             continue;
         }
 
+        if (cmd == "B" || cmd == "b" || cmd == "borrow") {
+            string isbn;
+            if (!(cin >> isbn)) break;
+            int idx = findByISBN(books, isbn);
+            if (idx < 0) {
+                cout << "Book not found: " << isbn << endl;
+            } else if (books[idx].borrowBook()) {
+                cout << "Borrowed successfully: " << isbn << endl;
+            } else {
+                cout << "ERROR: Book " << isbn << " is currently unavailable." << endl;
+            }
+            continue;
+        }
+
+        if (cmd == "R" || cmd == "r" || cmd == "return") {
+            string isbn;
+            if (!(cin >> isbn)) break;
+            int idx = findByISBN(books, isbn);
+            if (idx < 0) {
+                cout << "Book not found: " << isbn << endl;
+            } else if (!books[idx].available) {
+                books[idx].returnBook();
+                cout << "Returned successfully: " << isbn << endl;
+            } else {
+                cout << "Book " << isbn << " was not borrowed." << endl;
+            }
+            continue;
+        }
+
+        // Back-compat: if user types only an ISBN, treat it as a borrow
+        string isbn = cmd;  // 'cmd' is actually the ISBN the user typed
+        int idx = findByISBN(books, isbn);
+        if (idx < 0) {
+            cout << "Book not found: " << isbn << endl;
+            continue;
+        }
         if (books[idx].borrowBook()) {
-            cout << "Borrowed successfully: " << in << endl;
+            cout << "Borrowed successfully: " << isbn << endl;
         } else {
-            cout << "ERROR: Book " << in << " is currently unavailable." << endl;
+            cout << "ERROR: Book " << isbn << " is currently unavailable." << endl;
         }
     }
 
